@@ -1,0 +1,28 @@
+---
+source: crates/ruff_linter/src/noqa.rs
+expression: "ParsedFileExemption::try_extract(TextRange::up_to(source.text_len()), source)"
+snapshot_kind: text
+---
+Ok(
+    Some(
+        Codes(
+            Codes {
+                range: 0..44,
+                codes: [
+                    RuleIdent {
+                        identifier: Name(
+                            "unused-import",
+                        ),
+                        range: 14..27,
+                    },
+                    RuleIdent {
+                        identifier: Name(
+                            "unused-variable",
+                        ),
+                        range: 29..44,
+                    },
+                ],
+            },
+        ),
+    ),
+)
