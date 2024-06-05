@@ -184,6 +184,32 @@ mod tests {
     }
 
     #[test]
+    fn noqa_names() -> Result<()> {
+        let diagnostics = test_path(
+            Path::new("ruff/noqa_names.py"),
+            &settings::LinterSettings::for_rules(vec![
+                Rule::UnusedVariable,
+                Rule::AmbiguousVariableName,
+            ]),
+        )?;
+        assert_messages!(diagnostics);
+        Ok(())
+    }
+
+    #[test]
+    fn noqa_mixed() -> Result<()> {
+        let diagnostics = test_path(
+            Path::new("ruff/noqa_mixed.py"),
+            &settings::LinterSettings::for_rules(vec![
+                Rule::UnusedVariable,
+                Rule::AmbiguousVariableName,
+            ]),
+        )?;
+        assert_messages!(diagnostics);
+        Ok(())
+    }
+
+    #[test]
     fn ruf100_0() -> Result<()> {
         let diagnostics = test_path(
             Path::new("ruff/RUF100_0.py"),
@@ -352,6 +378,16 @@ mod tests {
     fn ruff_noqa_codes() -> Result<()> {
         let diagnostics = test_path(
             Path::new("ruff/ruff_noqa_codes.py"),
+            &settings::LinterSettings::for_rules(vec![Rule::UnusedImport, Rule::UnusedVariable]),
+        )?;
+        assert_messages!(diagnostics);
+        Ok(())
+    }
+
+    #[test]
+    fn ruff_noqa_names() -> Result<()> {
+        let diagnostics = test_path(
+            Path::new("ruff/ruff_noqa_names.py"),
             &settings::LinterSettings::for_rules(vec![Rule::UnusedImport, Rule::UnusedVariable]),
         )?;
         assert_messages!(diagnostics);
