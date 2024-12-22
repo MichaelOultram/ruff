@@ -2,17 +2,17 @@ use std::collections::HashMap;
 use std::sync::LazyLock;
 
 /// Returns the redirect target for the given code.
-pub(crate) fn get_redirect_target(code: &str) -> Option<&'static str> {
-    REDIRECTS.get(code).copied()
+pub(crate) fn get_code_redirect_target(code: &str) -> Option<&'static str> {
+    CODE_REDIRECTS.get(code).copied()
 }
 
 /// Returns the code and the redirect target if the given code is a redirect.
 /// (The same code is returned to obtain it with a static lifetime).
-pub(crate) fn get_redirect(code: &str) -> Option<(&'static str, &'static str)> {
-    REDIRECTS.get_key_value(code).map(|(k, v)| (*k, *v))
+pub(crate) fn get_code_redirect(code: &str) -> Option<(&'static str, &'static str)> {
+    CODE_REDIRECTS.get_key_value(code).map(|(k, v)| (*k, *v))
 }
 
-static REDIRECTS: LazyLock<HashMap<&'static str, &'static str>> = LazyLock::new(|| {
+static CODE_REDIRECTS: LazyLock<HashMap<&'static str, &'static str>> = LazyLock::new(|| {
     HashMap::from_iter([
         // The following are here because we don't yet have the many-to-one mapping enabled.
         ("SIM111", "SIM110"),
@@ -136,3 +136,11 @@ static REDIRECTS: LazyLock<HashMap<&'static str, &'static str>> = LazyLock::new(
         ("TCH010", "TC010"),
     ])
 });
+
+/// Returns the redirect target for the given rule name.
+pub(crate) fn get_name_redirect_target(code: &str) -> Option<&'static str> {
+    NAME_REDIRECTS.get(code).copied()
+}
+
+static NAME_REDIRECTS: LazyLock<HashMap<&'static str, &'static str>> =
+    LazyLock::new(|| HashMap::from_iter([]));

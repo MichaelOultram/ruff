@@ -17,7 +17,7 @@ use ruff_text_size::{Ranged, TextLen, TextRange, TextSize};
 use crate::codes::NoqaCode;
 use crate::fs::relativize_path;
 use crate::registry::{AsRule, Rule, RuleSet};
-use crate::rule_redirects::get_redirect_target;
+use crate::rule_redirects::{get_code_redirect_target, get_name_redirect_target};
 use crate::Locator;
 
 /// Generates an array of edits that matches the length of `diagnostics`.
@@ -321,8 +321,12 @@ impl Codes<'_> {
         let code_needle = needle.noqa_code();
         let name_needle = needle.as_ref();
         self.iter().any(|rule_ident| match rule_ident.identifier {
-            NoqaIdentifier::Code(code) => code_needle == get_redirect_target(code).unwrap_or(code),
-            NoqaIdentifier::Name(name) => name == name_needle,
+            NoqaIdentifier::Code(code) => {
+                code_needle == get_code_redirect_target(code).unwrap_or(code)
+            }
+            NoqaIdentifier::Name(name) => {
+                name_needle == get_name_redirect_target(name).unwrap_or(name)
+            }
         })
     }
 }
@@ -463,7 +467,7 @@ impl<'a> FileNoqaDirectives<'a> {
                                             return None;
                                         }
 
-                                        if let Ok(rule) = Rule::from_code(get_redirect_target(code).unwrap_or(code))
+                                        if let Ok(rule) = Rule::from_code(get_code_redirect_target(code).unwrap_or(code))
                                         {
                                             Some(rule.noqa_code())
                                         } else {
@@ -475,7 +479,7 @@ impl<'a> FileNoqaDirectives<'a> {
                                         }
                                     },
                                     NoqaIdentifier::Name(name) => {
-                                        if let Ok(rule) = Rule::from_name(name) {
+                                        if let Ok(rule) = Rule::from_name(get_name_redirect_target(name).unwrap_or(name)) {
                                             Some(rule.noqa_code())
                                         } else {
                                             #[allow(deprecated)]

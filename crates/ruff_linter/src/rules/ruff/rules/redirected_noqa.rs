@@ -5,7 +5,7 @@ use ruff_text_size::Ranged;
 use crate::noqa::{
     Codes, Directive, FileNoqaDirectives, NoqaDirectives, NoqaIdentifier, ParsedFileExemption,
 };
-use crate::rule_redirects::get_redirect_target;
+use crate::rule_redirects::{get_code_redirect_target, get_name_redirect_target};
 
 /// ## What it does
 /// Checks for `noqa` directives that use redirected rule codes.
@@ -72,14 +72,15 @@ pub(crate) fn redirected_file_noqa(
 /// Convert a sequence of [Codes] into [Diagnostic]s and append them to `diagnostics`.
 fn build_diagnostics(diagnostics: &mut Vec<Diagnostic>, codes: &Codes<'_>) {
     for rule_ident in codes.iter() {
-        let NoqaIdentifier::Code(code) = rule_ident.identifier() else {
-            continue;
+        let redirect = match rule_ident.identifier() {
+            NoqaIdentifier::Code(code) => get_code_redirect_target(code),
+            NoqaIdentifier::Name(name) => get_name_redirect_target(name),
         };
 
-        if let Some(redirected) = get_redirect_target(code) {
+        if let Some(redirected) = redirect {
             let mut diagnostic = Diagnostic::new(
                 RedirectedNOQA {
-                    original: code.to_string(),
+                    original: rule_ident.as_str().to_string(),
                     target: redirected.to_string(),
                 },
                 rule_ident.range(),

@@ -8,7 +8,7 @@ use strum_macros::EnumIter;
 use crate::codes::RuleIter;
 use crate::codes::{RuleCodePrefix, RuleGroup};
 use crate::registry::{Linter, Rule, RuleNamespace};
-use crate::rule_redirects::get_redirect;
+use crate::rule_redirects::get_code_redirect;
 use crate::settings::types::PreviewMode;
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
@@ -65,7 +65,7 @@ impl FromStr for RuleSelector {
             "C" => Ok(Self::C),
             "T" => Ok(Self::T),
             _ => {
-                let (s, redirected_from) = match get_redirect(s) {
+                let (s, redirected_from) = match get_code_redirect(s) {
                     Some((from, target)) => (target, Some(from)),
                     None => (s, None),
                 };

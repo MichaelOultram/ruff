@@ -14,7 +14,7 @@ use crate::noqa::{
     Directive, FileExemption, FileNoqaDirectives, NoqaDirectives, NoqaIdentifier, NoqaMapping,
 };
 use crate::registry::{AsRule, Rule, RuleSet};
-use crate::rule_redirects::get_redirect_target;
+use crate::rule_redirects::{get_code_redirect_target, get_name_redirect_target};
 use crate::rules::pygrep_hooks;
 use crate::rules::ruff;
 use crate::rules::ruff::rules::{UnusedCodes, UnusedNOQA};
@@ -133,11 +133,15 @@ pub(crate) fn check_noqa(
                         let original_identifier = directive.as_str();
                         let rule_result = match directive.identifier() {
                             NoqaIdentifier::Code(original_code) => {
-                                let code =
-                                    get_redirect_target(original_code).unwrap_or(original_code);
+                                let code = get_code_redirect_target(original_code)
+                                    .unwrap_or(original_code);
                                 Rule::from_code(code)
                             }
-                            NoqaIdentifier::Name(name) => Rule::from_name(name),
+                            NoqaIdentifier::Name(original_name) => {
+                                let name = get_name_redirect_target(original_name)
+                                    .unwrap_or(original_name);
+                                Rule::from_name(name)
+                            }
                         };
                         if let Ok(Rule::UnusedNOQA) = rule_result {
                             self_ignore = true;
